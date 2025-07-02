@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orlantech Innovations</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter for general text -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Roboto Mono for terminal feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Scrollbar Styles for app content areas */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(147, 197, 253, 0.5); /* Tailwind blue-300 with opacity */
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(147, 197, 253, 0.7);
+        }
+
+        /* Set font-family for the entire body */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* New global background with subtle pattern and darker gradient */
+            background-color: #0d0d0d; /* Dark base color */
+            background-image: radial-gradient(circle at center, rgba(30, 30, 30, 0.8) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
+                              url('https://placehold.co/1920x1080/0d0d0d/0d0d0d?text=Subtle+Pattern'); /* Placeholder for a subtle pattern */
+            background-size: 20px 20px, cover, cover;
+            background-position: 0 0, center center, center center;
+            background-attachment: fixed; /* Keep background fixed during scroll */
+        }
+
+        /* Specific font for terminal-like elements */
+        .font-mono-terminal {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Neon glow effect for text */
+        .neon-text-blue {
+            text-shadow: 0 0 5px rgba(0, 191, 255, 0.7), 0 0 10px rgba(0, 191, 255, 0.5), 0 0 15px rgba(0, 191, 255, 0.3);
+        }
+        .neon-text-green {
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.7), 0 0 10px rgba(0, 255, 0, 0.5), 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        .neon-text-purple {
+            text-shadow: 0 0 5px rgba(138, 43, 226, 0.7), 0 0 10px rgba(138, 43, 226, 0.5), 0 0 15px rgba(138, 43, 226, 0.3);
+        }
+
+        /* Animation for skill bars */
+        .skill-bar-fill {
+            width: 0%; /* Start at 0% */
+            transition: width 1.5s ease-out; /* Animate width over time */
+        }
+        .skill-bar-fill.animate {
+            /* Width set by JS */
+        }
+
+        /* Typing cursor animation for terminal inputs */
+        .typing-cursor {
+            display: inline-block;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-right-color: transparent }
+            50% { border-right-color: currentColor; }
+        }
+
+        /* Mobile bottom navigation */
+        @media (max-width: 767px) {
+            #dock {
+                display: none; /* Hide left dock on mobile */
+            }
+            #bottom-nav {
+                display: flex; /* Show bottom nav on mobile */
+            }
+            main {
+                padding-bottom: 72px; /* Make space for bottom nav */
+            }
+        }
+
+        /* Styles for the bar chart */
+        .bar-chart-container {
+            display: flex;
+            align-items: flex-end;
+            height: 100%;
+            gap: 8px;
+            padding: 16px;
+        }
+        .bar-chart-bar {
+            flex-grow: 1;
+            background: linear-gradient(to top, #3b82f6, #8b5cf6); /* blue-500 to purple-500 */
+            border-radius: 4px 4px 0 0;
+            height: 0; /* Start at 0 for animation */
+            transition: height 1.5s ease-out;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 5px; /* Space for label */
+        }
+        .bar-chart-bar .label {
+            position: absolute;
+            bottom: -20px; /* Position below the bar */
+            font-size: 0.75rem;
+            color: #9ca3af; /* gray-400 */
+        }
+        .bar-chart-bar .value {
+            position: absolute;
+            top: -20px; /* Position above the bar */
+            font-size: 0.875rem;
+            font-weight: bold;
+            color: #e0f2fe; /* blue-100 */
+            text-shadow: 0 0 3px rgba(0, 191, 255, 0.5);
+        }
+
+        /* Hero section video background styles */
+        #hero-video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2; /* Behind content, above global background */
+            filter: brightness(0.6); /* Darken the video slightly */
+        }
+
+        #hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Dark overlay for text readability */
+            z-index: -1; /* Above video, behind content */
+        }
+
+        #hero {
+            position: relative; /* Needed for absolute positioning of video/overlay */
+            overflow: hidden; /* Hide video overflow */
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen">
+
+    <!-- Boot Screen -->
+    <div id="boot-screen" class="fixed inset-0 flex items-center justify-center bg-black text-green-400 font-mono-terminal text-xl whitespace-pre-wrap p-8 z-[100]">
+        <span id="boot-message"></span><span class="animate-pulse">_</span>
+    </div>
+
+    <!-- Left Sidebar Dock (Desktop) -->
+    <div id="dock" class="fixed left-0 top-0 h-full hidden md:flex flex-col items-center p-4 bg-gray-800 bg-opacity-50 backdrop-blur-md rounded-r-lg shadow-lg z-50">
+        <!-- Orlantech Innovations Logo -->
+        <img
+    src="videos/Minimalist Wordmark Logo - Orlantech Innovations.jpg"
+    alt="Orlando's Profile"
+    class="mb-6 w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-blue-500 shadow-xl object-cover relative z-10"
+/>
+        <!-- App Icons -->
+        <button data-target-id="hero" class="nav-icon group relative flex flex-col items-center p-2 mb-4 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            <div class="text-white text-opacity-70 group-hover:text-opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-1.75-3M2 17h20M6 17H4a2 2 0 00-2 2v2a2 2 0 002 2h16a2 2 0 002-2v-2a2 2 0 00-2-2h-2M7 9h10l4 4v2H3v-2l4-4zm0 0V5a2 2 0 012-2h6a2 2 0 012 2v4M7 9h10" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1 text-white text-opacity-70 group-hover:text-opacity-100 transition-opacity duration-200">Home</span>
+        </button>
+        <button data-target-id="about" class="nav-icon group relative flex flex-col items-center p-2 mb-4 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            <div class="text-white text-opacity-70 group-hover:text-opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1 text-white text-opacity-70 group-hover:text-opacity-100 transition-opacity duration-200">About</span>
+        </button>
+        <button data-target-id="projects" class="nav-icon group relative flex flex-col items-center p-2 mb-4 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            <div class="text-white text-opacity-70 group-hover:text-opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1 text-white text-opacity-70 group-hover:text-opacity-100 transition-opacity duration-200">Projects</span>
+        </button>
+        <button data-target-id="hustle-tracker" class="nav-icon group relative flex flex-col items-center p-2 mb-4 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            <div class="text-white text-opacity-70 group-hover:text-opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1 text-white text-opacity-70 group-hover:text-opacity-100 transition-opacity duration-200">Hustle</span>
+        </button>
+        <button data-target-id="reels" class="nav-icon group relative flex flex-col items-center p-2 mb-4 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            <div class="text-white text-opacity-70 group-hover:text-opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1 text-white text-opacity-70 group-hover:text-opacity-100 transition-opacity duration-200">Reels</span>
+        </button>
+        <button data-target-id="skills" class="nav-icon group relative flex flex-col items-center p-2 mb-4 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            <div class="text-white text-opacity-70 group-hover:text-opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1 text-white text-opacity-70 group-hover:text-opacity-100 transition-opacity duration-200">Skills</span>
+        </button>
+        <button data-target-id="contact" class="nav-icon group relative flex flex-col items-center p-2 mb-4 rounded-lg transition-all duration-200 hover:bg-gray-700 hover:bg-opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+            <div class="text-white text-opacity-70 group-hover:text-opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1 text-white text-opacity-70 group-hover:text-opacity-100 transition-opacity duration-200">Contact</span>
+        </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 md:ml-24 p-4 space-y-16 md:space-y-24">
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-screen flex flex-col items-center justify-center text-center p-4 md:p-8">
+            <!-- Video Background for Hero Section -->
+            <video id="hero-video-background" autoplay loop muted playsinline>
+                <!-- Replace 'your-video.mp4' with the actual path to your video file -->
+                <!-- Consider using a webm version for better browser compatibility -->
+                <source src="videos/techba.mp4" type="video/mp4">
+                <!-- Fallback image if video is not supported -->
+                Your browser does not support the video tag.
+            </video>
+            <!-- Overlay for better text readability -->
+            <div id="hero-overlay"></div>
+
+        
+           <h1 class="text-5xl md:text-7xl font-extrabold mb-4 bg-gradient-to-r from-[#FFD700] via-[#FFC300] to-[#B8860B] bg-clip-text text-transparent drop-shadow-lg gold-premium-text relative z-10">
+               ORLANTECH INNOVATIONS
+            </h1>
+            <p id="hero-typing-message" class="text-2xl md:text-3xl text-green-400 font-mono-terminal whitespace-pre-wrap mb-8 neon-text-green relative z-10">
+                <span class="animate-pulse">_</span>
+            </p>
+           
+            <p class="text-lg md:text-xl text-gray-300 max-w-2xl relative z-10">
+                A self-taught developer and creative, building digital experiences with code and hustle.
+            </p>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 bg-gray-800 bg-opacity-50 backdrop-blur-md rounded-xl shadow-2xl border border-gray-700 border-opacity-50">
+            <h2 class="text-4xl font-bold mb-8 text-orange-400 neon-text-purple">About Me</h2>
+            <div class="w-full max-w-4xl bg-black bg-opacity-80 rounded-lg p-6 md:p-8 font-mono-terminal text-green-400 shadow-inner border border-green-700">
+                <pre class="whitespace-pre-wrap">
+                    <span class="text-blue-400">$</span> <span class="text-white">whoami</span>
+                    <span class="text-green-400">Orlando, a passionate developer and digital artisan.</span>
+                    <span class="text-green-400">I craft  web applications, custom software solutions and creative content.</span>
+
+                    <span class="text-blue-400">$</span> <span class="text-white">cat /etc/orlantech_manifesto.txt</span>
+                    <span class="text-gray-300">"Orlantech Innovations is my commitment to:</span>
+                    <span class="text-gray-300">  - Continuous learning and adaptation.</span>
+                    <span class="text-gray-300">  - Innovative problem-solving.</span>
+                    <span class="text-gray-300">  - Delivering high-quality, impactful digital solutions."</span>
+
+                    <span class="text-blue-400">$</span> <span class="text-white">ls -l ~/favorite_tools/</span>
+                    <span class="text-yellow-400">drwxr-xr-x  VSCode/</span>
+                    <span class="text-yellow-400">drwxr-xr-x  Django_Framework/</span>
+                    <span class="text-yellow-400">drwxr-xr-x  Pycharm/</span>
+                    <span class="text-yellow-400">drwxr-xr-x  TailwindCSS_Utility/</span>
+                    <span class="text-yellow-400">drwxr-xr-x  Kali Linux/</span>
+                    
+                </pre>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+            <h2 class="text-4xl font-bold mb-8 text-blue-400 neon-text-blue">My Projects</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+                <!-- Project Card 1 -->
+                <div class="bg-gray-800 bg-opacity-70 backdrop-blur-lg rounded-xl p-6 shadow-2xl border border-blue-700 border-opacity-50 hover:border-blue-500 transition-all duration-300 transform hover:scale-105">
+                    <img src="videos/Screenshot 2025-05-30 090728.png" alt="Django Inventory System" class="w-full h-40 object-cover rounded-md mb-4 border border-gray-600" />
+                    <h3 class="text-2xl font-semibold mb-2 text-white neon-text-blue">Inventory & Sales System</h3>
+                    <p class="text-gray-300 text-sm mb-4">A  Django application for managing inventory and sales, featuring user authentication, product tracking, and reporting.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-blue-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">Django</span>
+                        <span class="bg-purple-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">Python</span>
+                        <span class="bg-green-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">PostgreSQL</span>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center text-white neon-text-purple hover:underline transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            Demo
+                        </a>
+                        <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center text-white neon-text-blue hover:underline transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.419 2.865 8.165 6.839 9.485.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.618.069-.606.069-.606 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.089 2.902.83.091-.64.359-1.088.653-1.339-2.227-.253-4.566-1.114-4.566-4.945 0-1.093.39-1.988 1.029-2.681-.103-.253-.446-1.27.098-2.65 0 0 .84-.268 2.75 1.025A9.397 9.397 0 0112 6.75c.85.004 1.7.11 2.5.324 1.909-1.293 2.749-1.025 2.749-1.025.546 1.38.202 2.398.099 2.65.64.693 1.029 1.588 1.029 2.681 0 3.84-2.34 4.687-4.574 4.935.369.319.686.92.686 1.855 0 1.339-.012 2.419-.012 2.747 0 .268.18.579.688.482C21.137 20.163 24 16.418 24 12c0-5.523-4.477-10-10-10z"/></svg>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+                <!-- Project Card 2 -->
+                <div class="bg-gray-800 bg-opacity-70 backdrop-blur-lg rounded-xl p-6 shadow-2xl border border-purple-700 border-opacity-50 hover:border-purple-500 transition-all duration-300 transform hover:scale-105">
+                    <img src="videos/EchoSpace - Google Chrome 2025-06-25 08-46-08.gif" alt="EchoSpace Website" class="w-full h-40 object-cover rounded-md mb-4 border border-gray-600" />
+                    <h3 class="text-2xl font-semibold mb-2 text-white neon-text-purple">EchoSpace Website</h3>
+                    <p class="text-gray-300 text-sm mb-4">A modern, responsive website built with React, focusing on clean UI/UX and interactive components.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-red-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">React</span>
+                        <span class="bg-yellow-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">Django</span>
+                        <span class="bg-blue-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">Tailwind CSS</span>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="https://orland0henry.github.io/echospace/" target="_blank" rel="noopener noreferrer" class="flex items-center text-white neon-text-purple hover:underline transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            Demo
+                        </a>
+                        <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center text-white neon-text-blue hover:underline transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.419 2.865 8.165 6.839 9.485.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.618.069-.606.069-.606 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.089 2.902.83.091-.64.359-1.088.653-1.339-2.227-.253-4.566-1.114-4.566-4.945 0-1.093.39-1.988 1.029-2.681-.103-.253-.446-1.27.098-2.65 0 0 .84-.268 2.75 1.025A9.397 9.397 0 0112 6.75c.85.004 1.7.11 2.5.324 1.909-1.293 2.749-1.025 2.749-1.025.546 1.38.202 2.398.099 2.65.64.693 1.029 1.588 1.029 2.681 0 3.84-2.34 4.687-4.574 4.935.369.319.686.92.686 1.855 0 1.339-.012 2.419-.012 2.747 0 .268.18.579.688.482C21.137 20.163 24 16.418 24 12c0-5.523-4.477-10-10-10z"/></svg>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+                <!-- Project Card 3 -->
+                <div class="bg-gray-800 bg-opacity-70 backdrop-blur-lg rounded-xl p-6 shadow-2xl border border-green-700 border-opacity-50 hover:border-green-500 transition-all duration-300 transform hover:scale-105">
+                    <img src="videos/securelogin.jpg" alt="Secure Login Demo" class="w-full h-40 object-cover rounded-md mb-4 border border-gray-600" />
+                    <h3 class="text-2xl font-semibold mb-2 text-white neon-text-green">Secure Login Demo</h3>
+                    <p class="text-gray-300 text-sm mb-4">Demonstration of secure user authentication flows, including password hashing and JWT implementation.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-yellow-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">Node.js</span>
+                        <span class="bg-red-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">Express</span>
+                        <span class="bg-green-600 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">MongoDB</span>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center text-white neon-text-purple hover:underline transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            Demo
+                        </a>
+                        <a href="#" target="_blank" rel="noopener noreferrer" class="flex items-center text-white neon-text-blue hover:underline transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.419 2.865 8.165 6.839 9.485.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.618.069-.606.069-.606 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.089 2.902.83.091-.64.359-1.088.653-1.339-2.227-.253-4.566-1.114-4.566-4.945 0-1.093.39-1.988 1.029-2.681-.103-.253-.446-1.27.098-2.65 0 0 .84-.268 2.75 1.025A9.397 9.397 0 0112 6.75c.85.004 1.7.11 2.5.324 1.909-1.293 2.749-1.025 2.749-1.025.546 1.38.202 2.398.099 2.65.64.693 1.029 1.588 1.029 2.681 0 3.84-2.34 4.687-4.574 4.935.369.319.686.92.686 1.855 0 1.339-.012 2.419-.012 2.747 0 .268.18.579.688.482C21.137 20.163 24 16.418 24 12c0-5.523-4.477-10-10-10z"/></svg>
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hustle Tracker Section -->
+        <section id="hustle-tracker" class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 bg-gray-800 bg-opacity-50 backdrop-blur-md rounded-xl shadow-2xl border border-gray-700 border-opacity-50">
+            <h2 class="text-4xl font-bold mb-8 text-green-400 neon-text-green">My Grind Stats</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-6 shadow-lg border border-blue-600 flex items-center justify-between">
+                    <span class="text-xl text-gray-300">Lines of Code:</span>
+                    <span id="loc-counter" class="text-4xl font-bold text-blue-400 neon-text-blue">0</span>
+                </div>
+                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-6 shadow-lg border border-green-600 flex items-center justify-between">
+                    <span class="text-xl text-gray-300">Projects Shipped:</span>
+                    <span id="projects-counter" class="text-4xl font-bold text-green-400 neon-text-green">0</span>
+                </div>
+                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-6 shadow-lg border border-purple-600 flex items-center justify-between">
+                    <span class="text-xl text-gray-300">Clients Helped:</span>
+                    <span id="clients-counter" class="text-4xl font-bold text-purple-400 neon-text-purple">0</span>
+                </div>
+                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-6 shadow-lg border border-red-600 flex items-center justify-between">
+                    <span class="text-xl text-gray-300">Coffee Consumed:</span>
+                    <span id="coffee-counter" class="text-4xl font-bold text-red-400">0+</span>
+                </div>
+            </div>
+            <div class="mt-12 w-full max-w-4xl">
+                <h3 class="text-2xl font-semibold mb-4 text-white neon-text-blue text-center">Weekly Time Spent Coding (Visualizer)</h3>
+                <div id="coding-visualizer" class="w-full h-48 bg-black bg-opacity-70 rounded-lg flex items-end justify-around text-gray-400 text-lg border border-gray-600 shadow-inner p-4 relative overflow-hidden">
+                    <!-- Bars will be injected here by JS -->
+                    <div class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                        <p>Data visualization coming soon!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reels/Content Section -->
+        <section id="reels" class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+            <h2 class="text-4xl font-bold mb-8 text-purple-400 neon-text-purple">Creative Reels & Content</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+                <!-- Reel Card 1: DevDesk Setup Tour -->
+                <div class="bg-gray-800 bg-opacity-70 backdrop-blur-lg rounded-xl p-4 shadow-2xl border border-blue-700 border-opacity-50 hover:border-blue-500 transition-all duration-300 transform hover:scale-105">
+                    <h3 class="text-xl font-semibold mb-3 text-white neon-text-blue">DevDesk Setup Tour</h3>
+                    <a href="https://www.instagram.com/_orland.o/reel/DLJ3D9Aoigl/" target="_blank" rel="noopener noreferrer" class="block relative w-full aspect-video bg-black rounded-md overflow-hidden mb-4 border border-gray-600 group">
+                        <img src="videos/p7.jpg" alt="DevDesk Setup Tour Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null;this.src='https://placehold.co/400x225/1a202c/e2e8f0?text=Video+Thumbnail';" />
+                        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </a>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-700 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">#workspace</span>
+                        <span class="bg-purple-700 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">#setup</span>
+                    </div>
+                </div>
+                <!-- Reel Card 2: Coding Motivation -->
+                <div class="bg-gray-800 bg-opacity-70 backdrop-blur-lg rounded-xl p-4 shadow-2xl border border-purple-700 border-opacity-50 hover:border-purple-500 transition-all duration-300 transform hover:scale-105">
+                    <h3 class="text-xl font-semibold mb-3 text-white neon-text-purple">Coding Motivation</h3>
+                    <a href="https://www.instagram.com/_orland.o/p/DLMuEwRoebC/" target="_blank" rel="noopener noreferrer" class="block relative w-full aspect-video bg-black rounded-md overflow-hidden mb-4 border border-gray-600 group">
+                        <img src="videos/coding mot.jpg" alt="Coding Motivation Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null;this.src='https://placehold.co/400x225/1a202c/e2e8f0?text=Video+Thumbnail';" />
+                        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </a>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-purple-700 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">#motivation</span>
+                        <span class="bg-green-700 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">#devlife</span>
+                    </div>
+                </div>
+                <!-- Reel Card 3: Day in the Life of a Dev -->
+                <div class="bg-gray-800 bg-opacity-70 backdrop-blur-lg rounded-xl p-4 shadow-2xl border border-green-700 border-opacity-50 hover:border-green-500 transition-all duration-300 transform hover:scale-105">
+                    <h3 class="text-xl font-semibold mb-3 text-white neon-text-green">Day in the Life of a Dev</h3>
+                    <a href="https://www.instagram.com/_orland.o/reel/DLUMIfbIrB3/" target="_blank" rel="noopener noreferrer" class="block relative w-full aspect-video bg-black rounded-md overflow-hidden mb-4 border border-gray-600 group">
+                        <img src="videos/daily.gif" alt="Day in the Life of a Dev Thumbnail" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null;this.src='https://placehold.co/400x225/1a202c/e2e8f0?text=Video+Thumbnail';" />
+                        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </a>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-green-700 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">#vlog</span>
+                        <span class="bg-blue-700 bg-opacity-70 text-xs px-3 py-1 rounded-full text-white">#dailydev</span>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-400 text-sm mt-8 text-center">
+                Note: Clicking reel thumbnails will open the Instagram post in a new tab.
+            </p>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 bg-gray-800 bg-opacity-50 backdrop-blur-md rounded-xl shadow-2xl border border-gray-700 border-opacity-50">
+            <h2 class="text-4xl font-bold mb-8 text-yellow-400 neon-text-blue">My Skillset</h2>
+
+            <div class="mb-12 w-full max-w-4xl">
+                <h3 class="text-2xl font-semibold mb-6 text-white neon-text-purple text-center">Tech Stack & Expertise</h3>
+                <div class="space-y-6">
+                    <!-- Skill 1 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-300 text-xl flex items-center"><span class="mr-2 text-2xl">🐍</span> Python</span>
+                            <span class="text-gray-400 text-base">90%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="skill-bar-fill bg-gradient-to-r from-yellow-500 to-orange-500 h-full rounded-full shadow-md" data-skill-level="90"></div>
+                        </div>
+                    </div>
+                    <!-- Skill 2 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-300 text-xl flex items-center"><span class="mr-2 text-2xl">🔥</span> Django</span>
+                            <span class="text-gray-400 text-base">85%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="skill-bar-fill bg-gradient-to-r from-yellow-500 to-orange-500 h-full rounded-full shadow-md" data-skill-level="85"></div>
+                        </div>
+                    </div>
+                    <!-- Skill 3 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-300 text-xl flex items-center"><span class="mr-2 text-2xl">💨</span> Tailwind CSS</span>
+                            <span class="text-gray-400 text-base">80%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="skill-bar-fill bg-gradient-to-r from-yellow-500 to-orange-500 h-full rounded-full shadow-md" data-skill-level="80"></div>
+                        </div>
+                    </div>
+                    <!-- Skill 4 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-300 text-xl flex items-center"><span class="mr-2 text-2xl">⚡</span> JavaScript</span>
+                            <span class="text-gray-400 text-base">65%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="skill-bar-fill bg-gradient-to-r from-yellow-500 to-orange-500 h-full rounded-full shadow-md" data-skill-level="75"></div>
+                        </div>
+                    </div>
+                    <!-- Skill 5 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-300 text-xl flex items-center"><span class="mr-2 text-2xl">⚛️</span> React</span>
+                            <span class="text-gray-400 text-base">20%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="skill-bar-fill bg-gradient-to-r from-yellow-500 to-orange-500 h-full rounded-full shadow-md" data-skill-level="70"></div>
+                        </div>
+                    </div>
+                    <!-- Skill 6 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-300 text-xl flex items-center"><span class="mr-2 text-2xl">🎬</span> Video Editing</span>
+                            <span class="text-gray-400 text-base">65%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="skill-bar-fill bg-gradient-to-r from-yellow-500 to-orange-500 h-full rounded-full shadow-md" data-skill-level="65"></div>
+                        </div>
+                    </div>
+                    <!-- Skill 7 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-300 text-xl flex items-center"><span class="mr-2 text-2xl">😎</span> Terminal Guy</span>
+                            <span class="text-gray-400 text-base">95%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div class="skill-bar-fill bg-gradient-to-r from-yellow-500 to-orange-500 h-full rounded-full shadow-md" data-skill-level="95"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center w-full max-w-4xl">
+                <h3 class="text-2xl font-semibold mb-4 text-white neon-text-green">My Resume</h3>
+                <div class="bg-black bg-opacity-70 rounded-lg p-6 md:p-8 shadow-inner border border-green-700 text-left">
+                    <p class="text-lg text-gray-200 mb-4">
+                        Hello! I'm <span class="font-bold text-blue-400">Orlando Henry</span>, a passionate <span class="font-bold text-purple-400">Web Developer</span> proficient in <span class="text-yellow-400">HTML, CSS, Python, and Django</span>.
+                    </p>
+                    <p class="text-lg text-gray-200 mb-6">
+                        Beyond web development, I am a dedicated <span class="font-bold text-green-400">Cybersecurity Enthusiast</span> with a keen focus on <span class="text-orange-400">Penetration Testing</span> and <span class="text-orange-400">Web Application Hacking</span>. I thrive on exploring vulnerabilities and building secure systems.
+                    </p>
+                    <p class="text-gray-400 text-sm italic">
+                        This section provides a quick overview. For a detailed professional history and achievements, please download my full resume.
+                    </p>
+                </div>
+                <a
+                    href="#"
+                    download="Orlando_Henry_Resume.pdf"
+                    class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-200 shadow-lg transform hover:scale-105 neon-text-blue mt-8"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download Full Resume (PDF)
+                </a>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+            <h2 class="text-4xl font-bold mb-8 text-green-400 neon-text-green">Connect with Me</h2>
+            <div class="w-full max-w-3xl bg-black bg-opacity-80 rounded-lg p-6 md:p-8 font-mono-terminal text-green-400 shadow-inner border border-green-700">
+                <pre class="whitespace-pre-wrap">
+                    <p>> Initializing secure channel...</p>
+                    <p>> Ready for input.</p>
+                    <form id="contact-form" class="space-y-4 mt-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center">
+                            <label for="contact-name" class="w-full sm:w-16 text-lg">Name:</label>
+                            <input
+                                type="text"
+                                id="contact-name"
+                                name="name"
+                                class="flex-1 bg-transparent border-b border-green-500 focus:outline-none focus:border-blue-500 text-white py-1 pl-1"
+                                required
+                            />
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center">
+                            <label for="contact-email" class="w-full sm:w-16 text-lg">Email:</label>
+                            <input
+                                type="email"
+                                id="contact-email"
+                                name="email"
+                                class="flex-1 bg-transparent border-b border-green-500 focus:outline-none focus:border-blue-500 text-white py-1 pl-1"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label for="contact-message" class="block mb-2 text-lg">Message:</label>
+                            <textarea
+                                id="contact-message"
+                                rows="7"
+                                name="message"
+                                class="w-full bg-transparent border border-green-500 focus:outline-none focus:border-blue-500 text-white p-3 rounded-md"
+                                placeholder="Start typing your message here..."
+                                required
+                            ></textarea>
+                        </div>
+                        <button
+                            type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-200 shadow-lg flex items-center justify-center mx-auto transform hover:scale-105 neon-text-blue"
+                        >
+                            Transmit <span class="ml-3 text-xl">🚀</span>
+                        </button>
+                    </form>
+                    <p id="contact-status" class="mt-6 animate-pulse text-center text-gray-400 text-sm">
+                        Note: Submitting this form will open your default email client to send the message.
+                    </p>
+                </pre>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <div id="bottom-nav" class="fixed bottom-0 left-0 right-0 h-16 bg-gray-800 bg-opacity-70 backdrop-blur-md shadow-lg flex justify-around items-center z-50 md:hidden">
+        <button data-target-id="hero" class="nav-icon flex flex-col items-center text-white text-opacity-70 hover:text-opacity-100 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-1.75-3M2 17h20M6 17H4a2 2 0 00-2 2v2a2 2 0 002 2h16a2 2 0 002-2v-2a2 2 0 00-2-2h-2M7 9h10l4 4v2H3v-2l4-4zm0 0V5a2 2 0 012-2h6a2 2 0 012 2v4M7 9h10" />
+            </svg>
+            <span class="text-xs mt-1">Home</span>
+        </button>
+        <button data-target-id="projects" class="nav-icon flex flex-col items-center text-white text-opacity-70 hover:text-opacity-100 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+            <span class="text-xs mt-1">Projects</span>
+        </button>
+        <button data-target-id="skills" class="nav-icon flex flex-col items-center text-white text-opacity-70 hover:text-opacity-100 focus:outline-none">
+            <div class="text-white text-opacity-70 group-hover:text-opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1">Skills</span>
+        </button>
+        <button data-target-id="contact" class="nav-icon flex flex-col items-center text-white text-opacity-70 hover:text-opacity-100 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+            <span class="text-xs mt-1">Contact</span>
+        </button>
+        <button data-target-id="more-mobile-menu" class="nav-icon flex flex-col items-center text-white text-opacity-70 hover:text-opacity-100 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <span class="text-xs mt-1">More</span>
+        </button>
+    </div>
+
+    <!-- Mobile More Apps Modal -->
+    <div id="more-mobile-menu" class="fixed inset-0 bg-black bg-opacity-90 z-[60] hidden flex-col items-center justify-center p-4">
+        <h2 class="text-3xl font-bold mb-8 text-white neon-text-blue">More Apps</h2>
+        <ul class="space-y-6 text-center">
+            <li><button data-target-id="hustle-tracker" class="nav-icon text-2xl text-blue-400 hover:underline neon-text-blue">Hustle Tracker</button></li>
+            <li><button data-target-id="reels" class="nav-icon text-2xl text-purple-400 hover:underline neon-text-purple">Reels</button></li>
+            <li><button data-target-id="about" class="nav-icon text-2xl text-orange-400 hover:underline neon-text-green">About Me</button></li>
+        </ul>
+        <button id="close-mobile-menu" class="mt-12 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-200 shadow-lg transform hover:scale-105">
+            Close
+        </button>
+    </div>
+
+
+    <script>
+        // --- Global Elements ---
+        const bootScreen = document.getElementById('boot-screen');
+        const bootMessageSpan = document.getElementById('boot-message');
+        const navIcons = document.querySelectorAll('.nav-icon'); // All navigation icons
+        const mobileMoreMenu = document.getElementById('more-mobile-menu');
+        const closeMobileMenuButton = document.getElementById('close-mobile-menu');
+
+        // --- Boot Sequence ---
+        const bootMessages = [
+            "> No hype. No noise...",
+            "> Ni skills Code na Vision...",
+            "> ... Just a guy with a laptop...",
+            "> Welcome to ORLANTTECH INNOVATIONS.",
+            "> Where tech meets creativity and passion.",
+        ];
+        let currentMessageIndex = 0;
+        let currentCharIndex = 0;
+        let heroTypingTimeout;
+
+        function typeBootMessage() {
+            if (currentMessageIndex < bootMessages.length) {
+                const currentFullMessage = bootMessages[currentMessageIndex];
+                if (currentCharIndex < currentFullMessage.length) {
+                    bootMessageSpan.textContent += currentFullMessage[currentCharIndex];
+                    currentCharIndex++;
+                    setTimeout(typeBootMessage, 40); // Typing speed
+                } else {
+                    bootMessageSpan.textContent += '\n'; // Add newline after each message
+                    currentMessageIndex++;
+                    currentCharIndex = 0;
+                    setTimeout(typeBootMessage, 700); // Delay before next line
+                }
+            } else {
+                // All messages typed, hide boot screen and start hero typing
+                setTimeout(() => {
+                    bootScreen.classList.add('opacity-0', 'pointer-events-none');
+                    bootScreen.addEventListener('transitionend', () => {
+                        bootScreen.remove(); // Remove from DOM after transition
+                        typeHeroMessage(); // Start hero section typing
+                    }, { once: true });
+                }, 1000);
+            }
+        }
+
+        // --- Hero Section Typing Animation ---
+        const heroMessage = "> Building things with code & hustle.";
+        let heroCharIndex = 0;
+        const heroTypingMessageElement = document.getElementById('hero-typing-message');
+
+        function typeHeroMessage() {
+            if (heroCharIndex < heroMessage.length) {
+                heroTypingMessageElement.textContent = heroMessage.substring(0, heroCharIndex + 1);
+                heroCharIndex++;
+                heroTypingTimeout = setTimeout(typeHeroMessage, 60); // Typing speed for hero
+            } else {
+                heroTypingMessageElement.innerHTML += '<span class="typing-cursor">_</span>'; // Add blinking cursor
+            }
+        }
+
+        // --- Navigation and Smooth Scroll ---
+        navIcons.forEach(icon => {
+            icon.addEventListener('click', (event) => {
+                const targetId = icon.dataset.targetId;
+
+                if (targetId === 'more-mobile-menu' && window.innerWidth < 768) {
+                    mobileMoreMenu.classList.remove('hidden');
+                    mobileMoreMenu.classList.add('flex');
+                } else {
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
+                        // Close mobile menu if open
+                        mobileMoreMenu.classList.remove('flex');
+                        mobileMoreMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        closeMobileMenuButton.addEventListener('click', () => {
+            mobileMoreMenu.classList.remove('flex');
+            mobileMoreMenu.classList.add('hidden');
+        });
+
+        // --- Specific Section Animations/Logic ---
+
+        function animateCounter(elementId, targetValue, duration = 2000) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            let startValue = 0;
+            const increment = targetValue / (duration / 16); // ~60fps
+
+            let current = startValue;
+            const startTime = performance.now();
+
+            function updateCounter(timestamp) {
+                const elapsed = timestamp - startTime;
+                if (elapsed < duration) {
+                    current = Math.min(targetValue, startValue + (increment * (elapsed / 16)));
+                    element.textContent = Math.floor(current).toLocaleString() + (elementId === 'loc-counter' ? '+' : '');
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = targetValue.toLocaleString() + (elementId === 'loc-counter' ? '+' : '');
+                }
+            }
+            requestAnimationFrame(updateCounter);
+        }
+
+        const weeklyCodingData = [
+            { day: 'Mon', hours: 8 },
+            { day: 'Tue', hours: 7 },
+            { day: 'Wed', hours: 9 },
+            { day: 'Thu', hours: 6 },
+            { day: 'Fri', hours: 10 },
+            { day: 'Sat', hours: 4 },
+            { day: 'Sun', hours: 2 }
+        ];
+
+        function createCodingVisualizer() {
+            const container = document.getElementById('coding-visualizer');
+            if (!container) return;
+
+            // Clear placeholder text
+            container.innerHTML = '';
+            container.classList.add('bar-chart-container'); // Apply flex styles
+
+            const maxHours = Math.max(...weeklyCodingData.map(d => d.hours));
+
+            weeklyCodingData.forEach(data => {
+                const bar = document.createElement('div');
+                bar.classList.add('bar-chart-bar');
+                bar.style.height = '0%'; // Initial state for animation
+
+                const valueSpan = document.createElement('span');
+                valueSpan.classList.add('value');
+                valueSpan.textContent = data.hours + 'h';
+
+                const labelSpan = document.createElement('span');
+                labelSpan.classList.add('label');
+                labelSpan.textContent = data.day;
+
+                bar.appendChild(valueSpan);
+                bar.appendChild(labelSpan);
+                container.appendChild(bar);
+
+                // Animate height on next frame
+                requestAnimationFrame(() => {
+                    bar.style.height = `${(data.hours / maxHours) * 90 + 10}%`; // Scale to 10-100% of container height
+                });
+            });
+        }
+
+        function animateHustleStats() {
+            animateCounter('loc-counter', 58320);
+            animateCounter('projects-counter', 5);
+            animateCounter('clients-counter', 6);
+            animateCounter('coffee-counter', 100);
+            createCodingVisualizer(); // Call visualizer creation
+        }
+
+        function animateSkillBars() {
+            const skillBars = document.querySelectorAll('.skill-bar-fill');
+            skillBars.forEach(bar => {
+                const level = bar.dataset.skillLevel;
+                // Reset width to 0 then animate to target
+                bar.style.width = '0%';
+                requestAnimationFrame(() => {
+                    bar.style.width = `${level}%`;
+                    bar.classList.add('animate'); // Trigger transition
+                });
+            });
+        }
+
+        function setupContactForm() {
+            const contactForm = document.getElementById('contact-form');
+            const contactStatus = document.getElementById('contact-status');
+            const phoneNumber = '254798157050'; // Your WhatsApp number with country code
+
+            if (contactForm) {
+                contactForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+
+                    const name = document.getElementById('contact-name').value;
+                    const email = document.getElementById('contact-email').value;
+                    const message = document.getElementById('contact-message').value;
+
+                    const whatsappMessage = `Hello Orlando!%0A%0AName: ${encodeURIComponent(name)}%0AEmail: ${encodeURIComponent(email)}%0A%0AMessage:%0A${encodeURIComponent(message)}`;
+
+                    const whatsappLink = `https://wa.me/${phoneNumber}?text=${whatsappMessage}`;
+
+                    contactStatus.textContent = 'Opening WhatsApp...';
+
+                    // Open WhatsApp in a new tab
+                    window.open(whatsappLink, '_blank');
+
+                    // Provide feedback after a short delay
+                    setTimeout(() => {
+                        contactStatus.textContent = 'WhatsApp opened. Please send the message from there. ✅';
+                        contactForm.reset(); // Clear form fields after opening WhatsApp
+                    }, 1500);
+                });
+            }
+        }
+
+        // --- Intersection Observer for Animations ---
+        const observerOptions = {
+            root: null, // viewport
+            rootMargin: '0px',
+            threshold: 0.5 // Trigger when 50% of the section is visible
+        };
+
+        const sectionObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.id === 'hustle-tracker') {
+                        animateHustleStats();
+                    } else if (entry.target.id === 'skills') {
+                        animateSkillBars();
+                    } else if (entry.target.id === 'contact') {
+                        setupContactForm();
+                    }
+                    // Optionally unobserve after animation to prevent re-triggering
+                    // observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe sections that have animations
+        document.querySelectorAll('section').forEach(section => {
+            if (['hustle-tracker', 'skills', 'contact'].includes(section.id)) {
+                sectionObserver.observe(section);
+            }
+        });
+
+
+        // --- Initial Load ---
+        window.onload = typeBootMessage;
+    </script>
+
+</body>
+</html>
