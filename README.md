@@ -2,7 +2,7 @@
 
 Welcome to **Orlantech Innovations** — my personal portfolio crafted to reflect not just code, but the mindset behind it.
 
-> "Calm layout, loud journey."
+> "Where Tech Meets Creativity and Passion."
 
 ---
 
