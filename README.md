@@ -29,7 +29,7 @@ Built with:
 
 ## 🌐 Live Preview
 Check it out here:  
-👉 [orland0henry.github.io/orlantechInnovations/](https://orland0henry.github.io/orlantechInnovations/)
+👉 https://share.google/kjWyQ7Jll2DHq8uV1
 
 ---
 
